@@ -10,6 +10,7 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from app.db import init_db, SessionLocal
+from app.seed import seed as seed_db
 from app.models import Book, Order
 from app.nlu import parse
 
@@ -18,7 +19,13 @@ st.set_page_config(page_title="Bookstore Chatbot", page_icon="📚", layout="cen
 
 @st.cache_resource
 def _init():
+    # Create tables and ensure sample data exists if the DB is empty
     init_db()
+    try:
+        seed_db()
+    except Exception:
+        # Avoid crashing the app if seeding fails for any reason
+        pass
     return True
 
 _init()

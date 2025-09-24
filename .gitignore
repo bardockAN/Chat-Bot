@@ -1,2 +1,5 @@
-.venv/ 
-data/bookstore.db 
+.venv/
+data/bookstore.db
+__pycache__/
+*.py[cod]
+*.pyo
