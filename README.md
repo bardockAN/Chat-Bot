@@ -2,6 +2,8 @@
 
 Hệ thống chatbot thông minh hỗ trợ tìm kiếm và đặt mua sách bằng tiếng Việt tự nhiên.
 
+🌟 **[Trải nghiệm ngay tại đây](https://9qzwnzxnujruw4nv9m5izj.streamlit.app/)** - Không cần cài đặt!
+
 ## ✨ Tính Năng
 
 - 🔍 **Tìm kiếm sách**: Theo tên sách, tác giả, thể loại
@@ -61,7 +63,8 @@ Mở trình duyệt: http://localhost:8000
 ```powershell
 streamlit run app/streamlit_app.py
 ```
-Tự động mở: http://localhost:8501
+- **Local**: http://localhost:8501
+- **Live Demo**: https://9qzwnzxnujruw4nv9m5izj.streamlit.app/
 
 ## 💬 Ví Dụ Câu Lệnh
 
@@ -94,11 +97,13 @@ Bot sẽ hỏi thêm: họ tên, số điện thoại, địa chỉ để hoàn 
 
 ## 🚀 Deploy Production
 
-### Streamlit Cloud
+### Streamlit Cloud ⭐ (Recommended)
 1. Push code lên GitHub
 2. Kết nối repo với [Streamlit Cloud](https://streamlit.io/cloud)
 3. Main file: `app/streamlit_app.py`
 4. Deploy tự động!
+
+**Demo đang chạy**: https://9qzwnzxnujruw4nv9m5izj.streamlit.app/
 
 ### Render/Railway
 ```bash
