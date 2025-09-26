@@ -1,70 +1,151 @@
-## Chatbot nha sach - Huong dan cho nguoi moi
+# 📚 Chatbot Nhà Sách BookStore
 
-### 1) Yeu cau
-- Windows 10/11, Python 3.10+ da cai san (go `python --version`).
+Hệ thống chatbot thông minh hỗ trợ tìm kiếm và đặt mua sách bằng tiếng Việt tự nhiên.
 
-### 2) Tao moi truong va cai thu vien
-Mo PowerShell tai thu muc `D:\chatbot` va chay:
+## ✨ Tính Năng
+
+- 🔍 **Tìm kiếm sách**: Theo tên sách, tác giả, thể loại
+- 🛒 **Đặt hàng thông minh**: Ghi nhận thông tin đơn hàng đầy đủ
+- 💬 **Giao tiếp tự nhiên**: Nhận diện ngôn ngữ Việt với dấu
+- 🖥️ **Đa giao diện**: Console, Web (Flask), Streamlit
+- 💾 **Cơ sở dữ liệu**: SQLite với auto-seed dữ liệu mẫu
+
+## 🚀 Cài Đặt Nhanh
+
+### Yêu Cầu Hệ Thống
+- Windows 10/11 hoặc macOS/Linux
+- Python 3.10+ (kiểm tra: `python --version`)
+
+### 1. Thiết Lập Môi Trường
 
 ```powershell
+# Clone repository (nếu chưa có)
+git clone https://github.com/bardockAN/Chat-Bot.git
+cd Chat-Bot
+
+# Tạo môi trường ảo
 python -m venv .venv
-./.venv/Scripts/Activate.ps1
+
+# Kích hoạt môi trường (Windows)
+.\.venv\Scripts\Activate.ps1
+
+# Hoặc trên macOS/Linux
+# source .venv/bin/activate
+
+# Cài đặt thư viện
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Neu `requirements.txt` chua co, ban co the tao nhanh:
+### 2. Khởi Tạo Dữ Liệu
 
 ```powershell
-@'
-tabulate==0.9.0
-regex==2024.4.16
-SQLAlchemy==2.0.36
-colorama==0.4.6
-'@ | Set-Content requirements.txt
-```
-
-### 3) Khoi tao database va du lieu mau
-
-```powershell
+# Tạo database và thêm sách mẫu
 python -m app.seed
 ```
 
-Lan dau se tao file `data/bookstore.db` va chen mot vai quyen sach mau.
+## 🎮 Cách Sử Dụng
 
-### 4) Chay chatbot
-
+### 🖥️ Console (Giao diện dòng lệnh)
 ```powershell
 python -m app.chat
 ```
 
-### 4b) Chay giao dien web (Flask)
-
+### 🌐 Web App (Flask)
 ```powershell
 python -m app.web
 ```
-- Mo trinh duyet: `http://localhost:8000`
+Mở trình duyệt: http://localhost:8000
 
-### 4c) Chay giao dien Streamlit (tuy chon)
-
+### ⚡ Streamlit (Giao diện hiện đại)
 ```powershell
 streamlit run app/streamlit_app.py
 ```
-- Streamlit se mo trang web o dia chi hien thi trong console (thuong la `http://localhost:8501`).
+Tự động mở: http://localhost:8501
 
-### 5) Goi y cau lenh
-- Tim theo ten: `tim Dac Nhan Tam`
-- Tim theo tac gia: `tac gia Paulo Coelho`
-- Tim theo the loai: `the loai van hoc`
-- Dat hang: `dat sach Nha Gia Kim 2 quyen`
+## 💬 Ví Dụ Câu Lệnh
 
-Bot se hoi tiep cac thong tin con thieu: ho ten, so dien thoai, dia chi.
+| Mục đích | Ví dụ |
+|----------|-------|
+| **Tìm theo tên** | `tìm Đắc Nhân Tâm` |
+| **Tìm theo tác giả** | `tác giả Paulo Coelho` |
+| **Tìm theo thể loại** | `thể loại văn học` |
+| **Đặt hàng** | `đặt sách Nhà Giả Kim 2 quyển` |
 
-### 6) Giai thich nhanh
-- Thu muc `app/` chua: `db.py` (ket noi SQLite), `models.py` (bang `books`, `orders`), `seed.py` (chen du lieu mau), `nlu.py` (nhan dien y dinh bang quy tac), `chat.py` (vong lap hoi-dap console), `web.py` + `templates/index.html` (giao dien web).
+Bot sẽ hỏi thêm: họ tên, số điện thoại, địa chỉ để hoàn tất đơn hàng.
 
-### 7) Deploy nhanh (tuy chon)
-- Render/Railway: tao service Python, set start command: `python -m app.web`.
-- Luu y: SQLite la file cuc bo; de dung tren cloud nhe nhe co the van OK cho demo, hoac chuyen sang PostgreSQL neu can.
+## 🏗️ Cấu Trúc Dự Án
+
+```
+📦 Chat-Bot/
+├── 📁 app/
+│   ├── 🗃️ db.py              # Kết nối SQLite
+│   ├── 📋 models.py          # Models: Book, Order
+│   ├── 🌱 seed.py            # Dữ liệu mẫu
+│   ├── 🧠 nlu.py             # Xử lý ngôn ngữ tự nhiên
+│   ├── 💬 chat.py            # Console interface
+│   ├── 🌐 web.py             # Flask web app
+│   ├── ⚡ streamlit_app.py   # Streamlit interface
+│   └── 📁 templates/         # HTML templates
+├── 📁 data/                  # SQLite database
+├── 📋 requirements.txt       # Python dependencies
+└── 📖 README.md             # Tài liệu này
+```
+
+## 🚀 Deploy Production
+
+### Streamlit Cloud
+1. Push code lên GitHub
+2. Kết nối repo với [Streamlit Cloud](https://streamlit.io/cloud)
+3. Main file: `app/streamlit_app.py`
+4. Deploy tự động!
+
+### Render/Railway
+```bash
+# Build command
+pip install -r requirements.txt
+
+# Start command (Flask)
+python -m app.web
+
+# Hoặc (Streamlit)
+streamlit run app/streamlit_app.py --server.port=$PORT
+```
+
+## 🛠️ Kỹ Thuật
+
+- **Backend**: SQLAlchemy ORM, SQLite
+- **NLU**: Rule-based với regex patterns
+- **Web**: Flask + Bootstrap 5
+- **Modern UI**: Streamlit
+- **Vietnamese**: Unicode normalization
+
+## 📝 Cơ Sở Dữ Liệu
+
+### Books
+```sql
+book_id, title, author, price, stock, category
+```
+
+### Orders  
+```sql
+order_id, customer_name, phone, address, book_id, quantity, status, created_at
+```
+
+## 🤝 Đóng Góp
+
+1. Fork repository
+2. Tạo feature branch: `git checkout -b feature/ten-tinh-nang`
+3. Commit: `git commit -m "Thêm tính năng mới"`
+4. Push: `git push origin feature/ten-tinh-nang`
+5. Tạo Pull Request
+
+## 📄 License
+
+MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+
+---
+
+💡 **Mẹo**: Thử hỏi bot bằng nhiều cách khác nhau - nó hiểu khá thông minh!
 
 
