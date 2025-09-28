@@ -1,156 +1,113 @@
-# 📚 Chatbot Nhà Sách BookStore
+# BookStore Chatbot (Streamlit)
 
-Hệ thống chatbot thông minh hỗ trợ tìm kiếm và đặt mua sách bằng tiếng Việt tự nhiên.
+Chatbot for the BookStore with a Streamlit interface and SQLite database (ORM: SQLAlchemy).  
+Supports book lookup, order placement using natural language, and an admin panel for viewing/updating orders.  
+LLM is optional – the application runs fully without an API key.
 
-🌟 **[Trải nghiệm ngay tại đây](https://9qzwnzxnujruw4nv9m5izj.streamlit.app/)** - Không cần cài đặt!
+## Features
 
-## ✨ Tính Năng
+### Lookup & Conversation
+- Search by ID (e.g., `id: <number>`).
+- Exact search by title/author/genre (case-insensitive).
+- Fuzzy suggestions for misspelled queries.
+- Rule-based NLU: understands phrases like "buy 2 copies of Dac Nhan Tam," "books by Dale Carnegie," "genre Science," etc.
 
-- 🔍 **Tìm kiếm sách**: Theo tên sách, tác giả, thể loại
-- 🛒 **Đặt hàng thông minh**: Ghi nhận thông tin đơn hàng đầy đủ
-- 💬 **Giao tiếp tự nhiên**: Nhận diện ngôn ngữ Việt với dấu
-- 🖥️ **Đa giao diện**: Console, Web (Flask), Streamlit
-- 💾 **Cơ sở dữ liệu**: SQLite với auto-seed dữ liệu mẫu
+### Order Placement (Order Flow)
+- Type `order <book name>` (optionally include quantity: `order 2 Dac Nhan Tam`).
+- The bot will sequentially ask for quantity → customer name → phone number & address.  
+  Example: `0123456789 Ha Noi`
+- Creates an order (default status: pending) and updates stock.
 
-## 🚀 Cài Đặt Nhanh
+### Admin Panel
+- **Orders Table**: View orders and update statuses.
+- Valid statuses: `pending`, `confirmed`, `canceled`, `shipped`.
+- **Stock Rules**:
+  - `prev != canceled ➜ new == canceled` → Restock.
+  - `prev == canceled ➜ new in {pending, confirmed, shipped}` → Deduct stock (if sufficient).
+- **Danger Zone**: Delete ALL orders & Reset stock to SEED.  
+  Resets all orders and stock to initial values in `SAMPLE_BOOKS`.
 
-### Yêu Cầu Hệ Thống
-- Windows 10/11 hoặc macOS/Linux
-- Python 3.10+ (kiểm tra: `python --version`)
+### Sample Data (Seed)
+- Stored in SQLite: `data/bookstore.db`.
+- Initial stock:  
+  `Dac Nhan Tam (15)` • `Nha Gia Kim (10)` • `Tu duy nhanh va cham (8)` • `Sach Mat Biec (20)` • `Python Co Ban (25)`.
+- The app safely copies the sample DB to a writable directory if needed (safe for multi-environment runs).
 
-### 1. Thiết Lập Môi Trường
+## Installation & Running
 
-```powershell
-# Clone repository (nếu chưa có)
-git clone https://github.com/bardockAN/Chat-Bot.git
-cd Chat-Bot
+### Requirements
+- Python 3.10+
 
-# Tạo môi trường ảo
-python -m venv .venv
-
-# Kích hoạt môi trường (Windows)
-.\.venv\Scripts\Activate.ps1
-
-# Hoặc trên macOS/Linux
-# source .venv/bin/activate
-
-# Cài đặt thư viện
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### 2. Khởi Tạo Dữ Liệu
-
-```powershell
-# Tạo database và thêm sách mẫu
-python -m app.seed
-```
-
-## 🎮 Cách Sử Dụng
-
-### 🖥️ Console (Giao diện dòng lệnh)
-```powershell
-python -m app.chat
-```
-
-### 🌐 Web App (Flask)
-```powershell
-python -m app.web
-```
-Mở trình duyệt: http://localhost:8000
-
-### ⚡ Streamlit (Giao diện hiện đại)
-```powershell
-streamlit run app/streamlit_app.py
-```
-- **Local**: http://localhost:8501
-- **Live Demo**: https://9qzwnzxnujruw4nv9m5izj.streamlit.app/
-
-## 💬 Ví Dụ Câu Lệnh
-
-| Mục đích | Ví dụ |
-|----------|-------|
-| **Tìm theo tên** | `tìm Đắc Nhân Tâm` |
-| **Tìm theo tác giả** | `tác giả Paulo Coelho` |
-| **Tìm theo thể loại** | `thể loại văn học` |
-| **Đặt hàng** | `đặt sách Nhà Giả Kim 2 quyển` |
-
-Bot sẽ hỏi thêm: họ tên, số điện thoại, địa chỉ để hoàn tất đơn hàng.
-
-## 🏗️ Cấu Trúc Dự Án
-
-```
-📦 Chat-Bot/
-├── 📁 app/
-│   ├── 🗃️ db.py              # Kết nối SQLite
-│   ├── 📋 models.py          # Models: Book, Order
-│   ├── 🌱 seed.py            # Dữ liệu mẫu
-│   ├── 🧠 nlu.py             # Xử lý ngôn ngữ tự nhiên
-│   ├── 💬 chat.py            # Console interface
-│   ├── 🌐 web.py             # Flask web app
-│   ├── ⚡ streamlit_app.py   # Streamlit interface
-│   └── 📁 templates/         # HTML templates
-├── 📁 data/                  # SQLite database
-├── 📋 requirements.txt       # Python dependencies
-└── 📖 README.md             # Tài liệu này
-```
-
-## 🚀 Deploy Production
-
-### Streamlit Cloud ⭐ (Recommended)
-1. Push code lên GitHub
-2. Kết nối repo với [Streamlit Cloud](https://streamlit.io/cloud)
-3. Main file: `app/streamlit_app.py`
-4. Deploy tự động!
-
-**Demo đang chạy**: https://9qzwnzxnujruw4nv9m5izj.streamlit.app/
-
-### Render/Railway
+### Install Dependencies
 ```bash
-# Build command
 pip install -r requirements.txt
-
-# Start command (Flask)
-python -m app.web
-
-# Hoặc (Streamlit)
-streamlit run app/streamlit_app.py --server.port=$PORT
 ```
 
-## 🛠️ Kỹ Thuật
+### (Optional) Environment Variables
+Create a `.env` file if needed:
+```env
+# Enable demo data seeding on first run (default: "1")
+DEMO_MODE=1
 
-- **Backend**: SQLAlchemy ORM, SQLite
-- **NLU**: Rule-based với regex patterns
-- **Web**: Flask + Bootstrap 5
-- **Modern UI**: Streamlit
-- **Vietnamese**: Unicode normalization
-
-## 📝 Cơ Sở Dữ Liệu
-
-### Books
-```sql
-book_id, title, author, price, stock, category
+# Only required if using the LLM module (console test or custom integration)
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-### Orders  
-```sql
-order_id, customer_name, phone, address, book_id, quantity, status, created_at
+### Run the Application
+```bash
+streamlit run streamlit_app.py
+```
+Open your browser at: [http://localhost:8501](http://localhost:8501)
+
+## Quick Guide
+
+### Lookup
+- By ID: `5` or `id: 5`
+- By title/author/genre: `Dac Nhan Tam`, `Dale Carnegie`, `Ky nang`, etc.
+
+### Place Orders
+- `order Python Co Ban`
+- `order 2 Dac Nhan Tam`
+- When prompted for phone & address, enter: `0123456789 Ha Noi`.
+
+### Admin
+- Go to the **Admin** tab → select an order → update its status (stock rules apply).
+- Use **Danger Zone** → Delete ALL orders & Reset stock to SEED to reset stock to `15/10/8/20/25`.
+
+## Project Structure
+```plaintext
+chatbot/
+├── streamlit_app.py        # Main app (UI + chat + admin)
+├── app/
+│   ├── __init__.py
+│   ├── db.py               # DB connection, session helper, init_db()
+│   ├── models.py           # SQLAlchemy models: Book, Order
+│   ├── seed.py             # SAMPLE_BOOKS + seed()
+│   └── llm_chatbot.py      # (Optional) LLM engine for console/demo
+├── data/
+│   └── bookstore.db        # SQLite database (sample)
+├── .streamlit/
+│   └── secrets.toml        # (optional for Streamlit Cloud deployment)
+├── .env.template           # Environment variable template
+├── requirements.txt
+└── README.md
 ```
 
-## 🤝 Đóng Góp
+`llm_chatbot.py` uses OpenAI GPT-3.5-turbo for console demos; not required for the Streamlit app.
 
-1. Fork repository
-2. Tạo feature branch: `git checkout -b feature/ten-tinh-nang`
-3. Commit: `git commit -m "Thêm tính năng mới"`
-4. Push: `git push origin feature/ten-tinh-nang`
-5. Tạo Pull Request
+### (Optional) Try LLM Console
+```bash
+python -m app.llm_chatbot
+```
+Requires `OPENAI_API_KEY` in `.env`.
 
-## 📄 License
+## Troubleshooting
 
-MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+- **ImportError: circular import app.seed**  
+  Resolved in the source code (no self-imports). Use the latest file.
 
----
+- **No Data Visible**  
+  Ensure `DEMO_MODE=1` on the first run, or use the Danger Zone to reset to seed.
 
-💡 **Mẹo**: Thử hỏi bot bằng nhiều cách khác nhau - nó hiểu khá thông minh!
-
-
+- **Invalid Phone Number**  
+  Must be 9–11 digits. Correct format: `0123456789 Ha Noi`.
