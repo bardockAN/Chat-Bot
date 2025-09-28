@@ -1,7 +1,8 @@
-import os
+# app/db.py
 import tempfile
 import shutil
 from pathlib import Path
+from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
@@ -12,6 +13,7 @@ class Base(DeclarativeBase):
 
 
 def _writable_dir(preferred: Path) -> Path:
+    """Đảm bảo có thư mục ghi được (ưu tiên repo/data, nếu không thì %TEMP%)."""
     try:
         preferred.mkdir(parents=True, exist_ok=True)
         probe = preferred / ".write_test"
@@ -25,38 +27,51 @@ def _writable_dir(preferred: Path) -> Path:
 
 
 def get_database_url() -> str:
-    """Return a SQLite URL that works both locally and on Streamlit Cloud.
-
-    - Use repo `data/bookstore.db` if writable.
-    - If the repo path is read-only (typical on Streamlit Cloud), copy the
-      bundled database to a writable temp folder and use that file instead.
-    """
+    """Trả về SQLite URL, tự copy DB mẫu sang nơi ghi được nếu cần."""
     project_root = Path(__file__).resolve().parents[1]
     repo_data_dir = project_root / "data"
     repo_db = repo_data_dir / "bookstore.db"
 
-    # Choose a writable directory for runtime DB
     runtime_dir = _writable_dir(repo_data_dir)
     db_path = runtime_dir / "bookstore.db"
 
-    # If runtime DB doesn't exist but a bundled DB exists in the repo, copy it
     if not db_path.exists() and repo_db.exists():
         try:
             shutil.copy2(repo_db, db_path)
         except Exception:
-            # Best effort; if copy fails, SQLite will create an empty DB
+            # Nếu copy fail thì SQLite sẽ tự tạo DB rỗng.
             pass
 
     return f"sqlite:///{db_path.as_posix()}"
 
 
 engine = create_engine(get_database_url(), echo=False, future=True)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+
+# Quan trọng: không expire object sau commit để tránh DetachedInstanceError
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+    future=True,
+    expire_on_commit=False,
+)
+
+
+@contextmanager
+def get_db_session():
+    """Context manager session: tự commit/rollback/close."""
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 def init_db() -> None:
-    # Imported inside to avoid circulars
+    # Import trong hàm để tránh vòng lặp import
     from . import models  # noqa: F401
     Base.metadata.create_all(bind=engine)
-
-

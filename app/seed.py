@@ -1,8 +1,8 @@
+# app/seed.py
 from sqlalchemy import select
 
 from .db import SessionLocal, init_db
 from .models import Book
-
 
 SAMPLE_BOOKS = [
     {"title": "Dac Nhan Tam", "author": "Dale Carnegie", "price": 120000, "stock": 15, "category": "Ky nang"},
@@ -12,22 +12,16 @@ SAMPLE_BOOKS = [
     {"title": "Python Co Ban", "author": "Nguyen Van A", "price": 150000, "stock": 25, "category": "CNTT"},
 ]
 
-
 def seed() -> None:
     init_db()
     with SessionLocal() as session:
         existing = session.execute(select(Book)).scalars().all()
         if existing:
-            print("Database already has books. Skipping seed.")
+            # DB đã có dữ liệu thì bỏ qua
             return
-
         for b in SAMPLE_BOOKS:
             session.add(Book(**b))
         session.commit()
-        print(f"Inserted {len(SAMPLE_BOOKS)} books.")
-
 
 if __name__ == "__main__":
     seed()
-
-
